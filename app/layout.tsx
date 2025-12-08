@@ -17,10 +17,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="font-poppins">
-          <Header />
-          {children}
-          <Footer />
+        <body className="font-poppins antialiased">
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </body>
       </html>
     </ClerkProvider>
