@@ -2,6 +2,10 @@ import { defineQuery } from "next-sanity";
 
 const BRANDS_QUERY = defineQuery(`*[_type == "brand"] | order(name asc)`);
 
+const BRAND_QUERY = defineQuery(`*[_type == "product" && slug.current == $slug]{
+  "brandName": brand->title
+  }`);
+
 const LATEST_BLOG_QUERY = defineQuery(
   ` *[_type == 'blog' && isLatest == true]|order(name asc){
       ...,
@@ -17,4 +21,14 @@ const DEAL_PRODUCTS = defineQuery(
   }`
 );
 
-export { BRANDS_QUERY, LATEST_BLOG_QUERY, DEAL_PRODUCTS };
+const PRODUCT_BY_SLUG_QUERY = defineQuery(
+  `*[_type == "product" && slug.current == $slug] | order(name asc) [0]`
+);
+
+export {
+  BRANDS_QUERY,
+  BRAND_QUERY,
+  LATEST_BLOG_QUERY,
+  DEAL_PRODUCTS,
+  PRODUCT_BY_SLUG_QUERY,
+};
