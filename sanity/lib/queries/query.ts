@@ -25,10 +25,65 @@ const PRODUCT_BY_SLUG_QUERY = defineQuery(
   `*[_type == "product" && slug.current == $slug] | order(name asc) [0]`
 );
 
+const BLOG_CATEGORIES = defineQuery(
+  `*[_type == "blog"]{
+     blogcategories[]->{
+    ...
+    }
+  }`
+);
+
+const OTHERS_BLOG_QUERY = defineQuery(`*[
+  _type == "blog"
+  && defined(slug.current)
+  && slug.current != $slug
+]|order(publishedAt desc)[0...$quantity]{
+...
+  publishedAt,
+  title,
+  mainImage,
+  slug,
+  author->{
+    name,
+    image,
+  },
+  categories[]->{
+    title,
+    "slug": slug.current,
+  }
+}`);
+
+const SINGLE_BLOG_QUERY =
+  defineQuery(`*[_type == "blog" && slug.current == $slug][0]{
+  ..., 
+    author->{
+    name,
+    image,
+  },
+  blogcategories[]->{
+    title,
+    "slug": slug.current,
+  },
+}`);
+
+const GET_ALL_BLOG = defineQuery(
+  `*[_type == 'blog'] | order(publishedAt desc)[0...$quantity]{
+  ...,  
+     blogcategories[]->{
+    title
+}
+    }
+  `
+);
+
 export {
   BRANDS_QUERY,
   BRAND_QUERY,
   LATEST_BLOG_QUERY,
   DEAL_PRODUCTS,
   PRODUCT_BY_SLUG_QUERY,
+  BLOG_CATEGORIES,
+  OTHERS_BLOG_QUERY,
+  SINGLE_BLOG_QUERY,
+  GET_ALL_BLOG,
 };
