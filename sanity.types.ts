@@ -403,3 +403,17 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes = Address | Blogcategory | Slug | Blog | BlockContent | SanityImageCrop | SanityImageHotspot | Author | Order | Product | Brand | Category | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./sanity/lib/queries/query.ts
+// Variable: BRAND_QUERY
+// Query: *[_type == "product" && slug.current == $slug]{  "brandName": brand->title  }
+export type BRAND_QUERYResult = Array<{
+  brandName: string | null;
+}>;
+
+// Query TypeMap
+import "@sanity/client";
+declare module "@sanity/client" {
+  interface SanityQueries {
+    "*[_type == \"product\" && slug.current == $slug]{\n  \"brandName\": brand->title\n  }": BRAND_QUERYResult;
+  }
+}
