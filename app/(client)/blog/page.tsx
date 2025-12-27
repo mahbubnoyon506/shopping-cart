@@ -2,7 +2,7 @@ import Container from "@/components/Container";
 import { Title } from "@/components/ui/text";
 
 import { urlFor } from "@/sanity/lib/image";
-import { getAllBlogs } from "@/sanity/lib/queries";
+import { getAllBlogs } from "@/sanity/queries";
 
 import dayjs from "dayjs";
 import { Calendar } from "lucide-react";

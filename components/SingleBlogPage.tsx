@@ -7,7 +7,7 @@ import {
   getBlogCategories,
   getOthersBlog,
   getSingleBlog,
-} from "@/sanity/lib/queries";
+} from "@/sanity/queries";
 import dayjs from "dayjs";
 import { Calendar, ChevronLeftIcon, Pencil } from "lucide-react";
 import { PortableText } from "next-sanity";

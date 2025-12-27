@@ -7,7 +7,7 @@ import {
 } from "./ui/accordion";
 
 import { Product } from "@/sanity.types";
-import { getBrand } from "@/sanity/lib/queries";
+import { getBrand } from "@/sanity/queries";
 
 const ProductCharacteristics = async ({
   product,

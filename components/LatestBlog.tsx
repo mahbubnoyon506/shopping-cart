@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Calendar } from "lucide-react";
 import dayjs from "dayjs";
 import { Title } from "./ui/text";
-import { getLatestBlogs } from "@/sanity/lib/queries";
+import { getLatestBlogs } from "@/sanity/queries";
 
 const LatestBlog = async () => {
   const blogs = await getLatestBlogs();

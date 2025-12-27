@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
-import { getAllBrands } from "@/sanity/lib/queries";
+import { getAllBrands } from "@/sanity/queries";
 import { Title } from "./ui/text";
 
 const extraData = [

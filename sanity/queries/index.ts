@@ -1,4 +1,4 @@
-import { sanityFetch } from "../live";
+import { sanityFetch } from "../lib/live";
 import {
   BLOG_CATEGORIES,
   BRAND_QUERY,
@@ -6,6 +6,7 @@ import {
   DEAL_PRODUCTS,
   GET_ALL_BLOG,
   LATEST_BLOG_QUERY,
+  MY_ORDERS_QUERY,
   OTHERS_BLOG_QUERY,
   PRODUCT_BY_SLUG_QUERY,
   SINGLE_BLOG_QUERY,
@@ -144,6 +145,19 @@ const getSingleBlog = async (slug: string) => {
   }
 };
 
+const getMyOrders = async (userId: string) => {
+  try {
+    const orders = await sanityFetch({
+      query: MY_ORDERS_QUERY,
+      params: { userId },
+    });
+    return orders?.data || null;
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
+    return null;
+  }
+};
+
 export {
   getCategories,
   getAllBrands,
@@ -155,4 +169,5 @@ export {
   getOthersBlog,
   getSingleBlog,
   getAllBlogs,
+  getMyOrders,
 };

@@ -76,6 +76,13 @@ const GET_ALL_BLOG = defineQuery(
   `
 );
 
+const MY_ORDERS_QUERY =
+  defineQuery(`*[_type == 'order' && clerkUserId == $userId] | order(orderData desc){
+...,products[]{
+  ...,product->
+}
+}`);
+
 export {
   BRANDS_QUERY,
   BRAND_QUERY,
@@ -86,4 +93,5 @@ export {
   OTHERS_BLOG_QUERY,
   SINGLE_BLOG_QUERY,
   GET_ALL_BLOG,
+  MY_ORDERS_QUERY,
 };
