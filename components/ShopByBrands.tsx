@@ -33,7 +33,6 @@ const extraData = [
 
 const ShopByBrands = async () => {
   const brands = await getAllBrands();
-  console.log(brands);
 
   return (
     <div className="mb-10 lg:mb-20 bg-shop_light_bg p-5 lg:p-7 rounded-md">

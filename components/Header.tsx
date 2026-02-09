@@ -16,7 +16,6 @@ import CartIcon from "./CartIcon";
 const Header = async () => {
   const user = await currentUser();
   const { userId } = await auth();
-  console.log(userId);
 
   let orders = null;
   if (userId) {
