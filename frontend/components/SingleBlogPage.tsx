@@ -1,20 +1,18 @@
 import Container from "@/components/Container";
-import { Title } from "@/components/ui/text";
-
-import { SINGLE_BLOG_QUERYResult } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
 import {
   getBlogCategories,
-  getOthersBlog,
+  getSimilarBlogs,
   getSingleBlog,
-} from "@/sanity/queries";
+} from "@/components/hooks/useFetchBlogs";
+import { Title } from "@/components/ui/text";
+import { urlFor } from "@/sanity/lib/image";
+import { Blog, BlogCategory } from "@/utils/types";
 import dayjs from "dayjs";
 import { Calendar, ChevronLeftIcon, Pencil } from "lucide-react";
 import { PortableText } from "next-sanity";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import React from "react";
 
 const SingleBlogPage = async ({
   params,
@@ -22,7 +20,7 @@ const SingleBlogPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const blog: SINGLE_BLOG_QUERYResult = await getSingleBlog(slug);
+  const blog = await getSingleBlog(slug);
   if (!blog) return notFound();
 
   return (
@@ -31,7 +29,7 @@ const SingleBlogPage = async ({
         <div className="md:col-span-3">
           {blog?.mainImage && (
             <Image
-              src={urlFor(blog?.mainImage).url()}
+              src={blog?.mainImage}
               alt={blog.title || "Blog Image"}
               width={800}
               height={800}
@@ -49,7 +47,7 @@ const SingleBlogPage = async ({
                     >
                       {item?.title}
                     </p>
-                  )
+                  ),
                 )}
                 <span className="absolute left-0 -bottom-1.5 bg-lightColor/30 inline-block w-full h-[2px] group-hover:bg-shop_dark_green hover:cursor-pointer hoverEffect" />
               </div>
@@ -194,19 +192,19 @@ const SingleBlogPage = async ({
 
 const BlogLeft = async ({ slug }: { slug: string }) => {
   const categories = await getBlogCategories();
-  const blogs = await getOthersBlog(slug, 5);
+  const blogs = await getSimilarBlogs(slug);
 
   return (
     <div>
       <div className="border border-lightColor p-5 rounded-md">
         <Title className="text-base">Blog Categories</Title>
         <div className="space-y-2 mt-2">
-          {categories?.map(({ blogcategories }, index) => (
+          {categories?.map((blogcategories: BlogCategory) => (
             <div
-              key={index}
+              key={blogcategories._id}
               className="text-lightColor flex items-center justify-between text-sm font-medium"
             >
-              <p>{blogcategories[0]?.title}</p>
+              <p>{blogcategories?.title}</p>
               <p className="text-darkColor font-semibold">{`(1)`}</p>
             </div>
           ))}
@@ -217,7 +215,7 @@ const BlogLeft = async ({ slug }: { slug: string }) => {
         <div className="space-y-4 mt-4">
           {blogs?.map((blog: Blog, index: number) => (
             <Link
-              href={`/blog/${blog?.slug?.current}`}
+              href={`/blog/${blog?.slug}`}
               key={index}
               className="flex items-center gap-2 group"
             >

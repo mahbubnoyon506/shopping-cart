@@ -27,9 +27,11 @@ const OrderDetailDialog: React.FC<OrderDetailsDialogProps> = ({
   onClose,
 }) => {
   if (!order) return null;
+  console.log(order);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!max-w-4xl max-h-[90vh] overflow-y-scroll">
+      <DialogContent className="max-w-4xl! max-h-[90vh] overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Order Details - {order?.orderNumber}</DialogTitle>
         </DialogHeader>

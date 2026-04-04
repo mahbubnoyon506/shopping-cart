@@ -13,42 +13,39 @@ const priceArray = [
 ];
 
 interface Props {
-  selectedPrice?: string | null;
-  setSelectedPrice: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedPrices: string[];
+  setSelectedPrices: React.Dispatch<React.SetStateAction<string[]>>;
 }
-const PriceList = ({ selectedPrice, setSelectedPrice }: Props) => {
+
+const PriceList = ({ selectedPrices, setSelectedPrices }: Props) => {
+  const handleToggle = (val: string) => {
+    setSelectedPrices((prev) =>
+      prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+    );
+  };
+
   return (
-    <div className="w-full bg-white p-5">
-      <Title className="text-base font-black">Price</Title>
-      <RadioGroup className="mt-2 space-y-1" value={selectedPrice || ""}>
-        {priceArray?.map((price, index) => (
-          <div
-            key={index}
-            onClick={() => setSelectedPrice(price?.value)}
-            className="flex items-center space-x-2 hover:cursor-pointer"
-          >
-            <RadioGroupItem
-              value={price?.value}
-              id={price?.value}
-              className="rounded-sm"
+    <div className="w-full bg-white p-5 border-b">
+      <Title className="text-base font-black uppercase mb-4">Price Range</Title>
+      <div className="flex flex-col gap-3">
+        {priceArray.map((price) => (
+          <div key={price.value} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={`price-${price.value}`}
+              checked={selectedPrices.includes(price.value)}
+              onChange={() => handleToggle(price.value)}
+              className="w-4 h-4 accent-shop_dark_green cursor-pointer"
             />
             <Label
-              htmlFor={price.value}
-              className={`${selectedPrice === price?.value ? "font-semibold text-shop_dark_green" : "font-normal"}`}
+              htmlFor={`price-${price.value}`}
+              className={`cursor-pointer ${selectedPrices.includes(price.value) ? "font-semibold text-shop_dark_green" : "font-normal"}`}
             >
-              {price?.title}
+              {price.title}
             </Label>
           </div>
         ))}
-      </RadioGroup>
-      {selectedPrice && (
-        <button
-          onClick={() => setSelectedPrice(null)}
-          className="text-sm font-medium mt-2 underline underline-offset-2 decoration-[1px] hover:text-shop_dark_green hoverEffect"
-        >
-          Reset selection
-        </button>
-      )}
+      </div>
     </div>
   );
 };

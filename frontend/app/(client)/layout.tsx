@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "../globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { ClerkProvider } from "@clerk/nextjs";
+
+import QueryProvider from "@/provider/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <QueryProvider>
       <html lang="en">
         <body className="font-poppins antialiased">
           <div className="flex flex-col min-h-screen">
@@ -25,6 +26,6 @@ export default function RootLayout({
           </div>
         </body>
       </html>
-    </ClerkProvider>
+    </QueryProvider>
   );
 }

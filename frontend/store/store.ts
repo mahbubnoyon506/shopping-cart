@@ -1,10 +1,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Product } from "./sanity.types";
+import { Product } from "../utils/types";
 
 export interface CartItem {
   product: Product;
   quantity: number;
+}
+
+export interface Order {
+  _id: string;
+  orderNumber: string;
+  totalPrice: number;
+  status: string;
+  products: { product: string | Product; quantity: number }[];
+  createdAt: string;
 }
 
 interface StoreState {
@@ -22,6 +31,9 @@ interface StoreState {
   addToFavorite: (product: Product) => Promise<void>;
   removeFromFavorite: (productId: string) => void;
   resetFavorite: () => void;
+  orders: Order[];
+  setOrders: (orders: Order[]) => void;
+  resetOrders: () => void;
 }
 
 const useStore = create<StoreState>()(
@@ -32,17 +44,18 @@ const useStore = create<StoreState>()(
     (set, get) => ({
       items: [],
       favoriteProduct: [],
+      orders: [],
       addItem: (product) =>
         set((state) => {
           const existingItem = state.items.find(
-            (item) => item.product._id === product._id
+            (item) => item.product._id === product._id,
           );
           if (existingItem) {
             return {
               items: state.items.map((item) =>
                 item.product._id === product._id
                   ? { ...item, quantity: item.quantity + 1 }
-                  : item
+                  : item,
               ),
             };
           } else {
@@ -65,14 +78,14 @@ const useStore = create<StoreState>()(
       deleteCartProduct: (productId) =>
         set((state) => ({
           items: state.items.filter(
-            ({ product }) => product?._id !== productId
+            ({ product }) => product?._id !== productId,
           ),
         })),
       resetCart: () => set({ items: [] }),
       getTotalPrice: () => {
         return get().items.reduce(
           (total, item) => total + (item.product.price ?? 0) * item.quantity,
-          0
+          0,
         );
       },
       getSubTotalPrice: () => {
@@ -92,12 +105,12 @@ const useStore = create<StoreState>()(
         return new Promise<void>((resolve) => {
           set((state: StoreState) => {
             const isFavorite = state.favoriteProduct.some(
-              (item) => item._id === product._id
+              (item) => item._id === product._id,
             );
             return {
               favoriteProduct: isFavorite
                 ? state.favoriteProduct.filter(
-                    (item) => item._id !== product._id
+                    (item) => item._id !== product._id,
                   )
                 : [...state.favoriteProduct, { ...product }],
             };
@@ -108,18 +121,20 @@ const useStore = create<StoreState>()(
       removeFromFavorite: (productId: string) => {
         set((state: StoreState) => ({
           favoriteProduct: state.favoriteProduct.filter(
-            (item) => item?._id !== productId
+            (item) => item?._id !== productId,
           ),
         }));
       },
       resetFavorite: () => {
         set({ favoriteProduct: [] });
       },
+      setOrders: (orders) => set({ orders }),
+      resetOrders: () => set({ orders: [] }),
     }),
     {
       name: "cart-store",
-    }
-  )
+    },
+  ),
 );
 
 export default useStore;

@@ -1,3 +1,4 @@
+// import { Product } from './types';
 export interface BaseDocument {
   _id: string;
   createdAt: string;
@@ -15,6 +16,7 @@ export interface Product extends BaseDocument {
   slug: string;
   description?: string;
   price: number;
+  quantity?: number;
   discount: number;
   stock: number;
   status: "new" | "hot" | "sale" | "regular";
@@ -67,6 +69,23 @@ export interface Order extends BaseDocument {
     product: string | Product;
     quantity: number;
   }>;
+}
+
+export interface OrderSummary {
+  _id: string;
+  email: string;
+  orderNumber: string;
+  customerName: string;
+  amountDiscount: number;
+  totalPrice: number;
+  status: string;
+  products: Array<Product>;
+  invoice: {
+    number: number;
+    hosted_invoice_url: string;
+  };
+  createdAt: string;
+  orderDate: string;
 }
 
 export interface BlogCategory extends BaseDocument {

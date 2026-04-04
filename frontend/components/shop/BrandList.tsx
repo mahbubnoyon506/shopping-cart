@@ -1,49 +1,55 @@
-import { BRANDS_QUERYResult } from "@/sanity.types";
 import React from "react";
 
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { Title } from "../ui/text";
+import { Brand } from "@/utils/types";
+import { useGetBrands } from "../hooks/useFetchBrands";
 
 interface Props {
-  brands: BRANDS_QUERYResult;
-  selectedBrand?: string | null;
-  setSelectedBrand: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedBrands: string[];
+  setSelectedBrands: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const BrandList = ({ brands, selectedBrand, setSelectedBrand }: Props) => {
+const BrandList = ({ selectedBrands, setSelectedBrands }: Props) => {
+  const { data: brands } = useGetBrands();
+
+  const handleToggle = (slug: string) => {
+    setSelectedBrands((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+    );
+  };
+
   return (
-    <div className="w-full bg-white p-5">
-      <Title className="text-base font-black">Brands</Title>
-      <RadioGroup value={selectedBrand || ""} className="mt-2 space-y-1">
-        {brands?.map((brand) => (
-          <div
-            key={brand?._id}
-            onClick={() => setSelectedBrand(brand?.slug?.current as string)}
-            className="flex items-center space-x-2 hover:cursor-pointer"
-          >
-            <RadioGroupItem
-              value={brand?.slug?.current as string}
-              id={brand?.slug?.current}
-              className="rounded-sm"
+    <div className="w-full bg-white p-5 border-b">
+      <Title className="text-base font-black uppercase mb-4">Brands</Title>
+      <div className="flex flex-col gap-3">
+        {brands?.data?.map((brand: Brand) => (
+          <div key={brand?._id} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={brand?.slug}
+              checked={selectedBrands.includes(brand?.slug)}
+              onChange={() => handleToggle(brand?.slug)}
+              className="w-4 h-4 accent-shop_dark_green cursor-pointer"
             />
             <Label
-              htmlFor={brand?.slug?.current}
-              className={`${selectedBrand === brand?.slug?.current ? "font-semibold text-shop_dark_green" : "font-normal"}`}
+              htmlFor={brand?.slug}
+              className={`cursor-pointer ${selectedBrands.includes(brand?.slug) ? "font-semibold text-shop_dark_green" : "font-normal"}`}
             >
               {brand?.title}
             </Label>
           </div>
         ))}
-        {selectedBrand && (
-          <button
-            onClick={() => setSelectedBrand(null)}
-            className="text-sm font-medium mt-2 underline underline-offset-2 decoration-[1px] hover:text-shop_dark_green hoverEffect text-left"
-          >
-            Reset selection
-          </button>
-        )}
-      </RadioGroup>
+      </div>
+      {selectedBrands.length > 0 && (
+        <button
+          onClick={() => setSelectedBrands([])}
+          className="text-xs text-red-500 mt-4 underline"
+        >
+          Reset Brands
+        </button>
+      )}
     </div>
   );
 };

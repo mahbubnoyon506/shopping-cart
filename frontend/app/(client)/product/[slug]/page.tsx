@@ -1,13 +1,12 @@
 import AddToCartButton from "@/components/AddToCartButton";
 import Container from "@/components/Container";
 import FavouriteButton from "@/components/FavouriteButton";
+import { getProductBySlug } from "@/components/hooks/useFetchProducts";
 import ImageView from "@/components/ImageView";
 import PriceView from "@/components/PriceView";
 import ProductCharacteristics from "@/components/ProductCharacteristics";
-import { getProductBySlug } from "@/sanity/queries";
 import { CornerDownLeft, StarIcon, Truck } from "lucide-react";
 import { notFound } from "next/navigation";
-import React from "react";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import { FiShare2 } from "react-icons/fi";
 import { RxBorderSplit } from "react-icons/rx";

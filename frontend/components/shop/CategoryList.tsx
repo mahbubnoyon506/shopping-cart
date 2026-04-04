@@ -1,53 +1,53 @@
-import { Category } from "@/sanity.types";
 import React from "react";
 
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { Title } from "../ui/text";
+import { Category } from "@/utils/types";
+import { useGetCategories } from "../hooks/useFetchProducts";
 
 interface Props {
-  categories: Category[];
-  selectedCategory?: string | null;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedCategories: string[];
+  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const CategoryList = ({
-  categories,
-  selectedCategory,
-  setSelectedCategory,
-}: Props) => {
+const CategoryList = ({ selectedCategories, setSelectedCategories }: Props) => {
+  const { data: categories } = useGetCategories();
+
+  const handleToggle = (slug: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+    );
+  };
+
   return (
-    <div className="w-full bg-white p-5">
-      <Title className="text-base font-black">Product Categories</Title>
-      <RadioGroup value={selectedCategory || ""} className="mt-2 space-y-1">
-        {categories?.map((category) => (
-          <div
-            onClick={() => {
-              setSelectedCategory(category?.slug?.current as string);
-            }}
-            key={category?._id}
-            className="flex items-center space-x-2 hover:cursor-pointer"
-          >
-            <RadioGroupItem
-              value={category?.slug?.current as string}
-              id={category?.slug?.current}
-              className="rounded-sm"
+    <div className="w-full bg-white p-5 border-b">
+      <Title className="text-base font-black uppercase mb-4">Categories</Title>
+      <div className="flex flex-col gap-3">
+        {categories?.data?.map((category: Category) => (
+          <div key={category?._id} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={category?.slug}
+              checked={selectedCategories.includes(category?.slug)}
+              onChange={() => handleToggle(category?.slug)}
+              className="w-4 h-4 accent-shop_dark_green cursor-pointer"
             />
             <Label
-              htmlFor={category?.slug?.current}
-              className={`${selectedCategory === category?.slug?.current ? "font-semibold text-shop_dark_green" : "font-normal"}`}
+              htmlFor={category?.slug}
+              className={`cursor-pointer ${selectedCategories.includes(category?.slug) ? "font-semibold text-shop_dark_green" : "font-normal"}`}
             >
               {category?.title}
             </Label>
           </div>
         ))}
-      </RadioGroup>
-      {selectedCategory && (
+      </div>
+      {selectedCategories.length > 0 && (
         <button
-          onClick={() => setSelectedCategory(null)}
-          className="text-sm font-medium mt-2 underline underline-offset-2 decoration-[1px] hover:text-shop_dark_green hoverEffect text-left"
+          onClick={() => setSelectedCategories([])}
+          className="text-xs text-red-500 mt-4 underline"
         >
-          Reset selection
+          Reset Categories
         </button>
       )}
     </div>

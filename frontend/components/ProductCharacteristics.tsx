@@ -6,15 +6,15 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 
-import { Product } from "@/sanity.types";
 import { getBrand } from "@/sanity/queries";
+import { Product } from "@/utils/types";
 
 const ProductCharacteristics = async ({
   product,
 }: {
   product: Product | null | undefined;
 }) => {
-  const brand = await getBrand(product?.slug?.current as string);
+  const brand = await getBrand(product?.slug as string);
 
   return (
     <Accordion type="single" collapsible>

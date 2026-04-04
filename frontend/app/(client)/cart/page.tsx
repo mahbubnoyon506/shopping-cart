@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  createCheckoutSession,
-  Metadata,
-} from "@/actions/createCheckoutSession";
 import Container from "@/components/Container";
 import EmptyCart from "@/components/EmptyCart";
 
@@ -24,11 +20,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { api } from "@/lib/api";
 import { Address } from "@/sanity.types";
 import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-import useStore from "@/store";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuthStore } from "@/store/authStore";
+import useStore from "@/store/store";
 import { ShoppingBag, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,8 +41,7 @@ const CartPage = () => {
   } = useStore();
   const [loading, setLoading] = useState(false);
   const groupedItems = useStore((state) => state.getGroupedItems());
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { token, user } = useAuthStore();
   const [addresses, setAddresses] = useState<Address[] | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
@@ -73,7 +68,7 @@ const CartPage = () => {
   }, []);
   const handleResetCart = () => {
     const confirmed = window.confirm(
-      "Are you sure you want to reset your cart?"
+      "Are you sure you want to reset your cart?",
     );
     if (confirmed) {
       resetCart();
@@ -84,26 +79,32 @@ const CartPage = () => {
   const handleCheckout = async () => {
     setLoading(true);
     try {
-      const metadata: Metadata = {
+      const metadata = {
         orderNumber: crypto.randomUUID(),
-        customerName: user?.fullName ?? "Unknown",
-        customerEmail: user?.emailAddresses[0]?.emailAddress ?? "Unknown",
-        clerkUserId: user?.id,
+        customerName: user?.name || "Guest",
+        customerEmail: user?.email,
         address: selectedAddress,
       };
-      const checkoutUrl = await createCheckoutSession(groupedItems, metadata);
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
+
+      const res = await api.post(
+        "/payments/create-checkout",
+        { items: groupedItems, metadata },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (res.data.url) {
+        window.location.href = res.data.url;
       }
     } catch (error) {
-      console.error("Error creating checkout session:", error);
+      console.error("Stripe Checkout Error:", error);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="bg-gray-50 pb-52 md:pb-10">
-      {isSignedIn ? (
+      {token ? (
         <Container>
           {groupedItems?.length ? (
             <>
@@ -124,12 +125,12 @@ const CartPage = () => {
                           <div className="flex flex-1 items-start gap-2 h-36 md:h-44">
                             {product?.images && (
                               <Link
-                                href={`/product/${product?.slug?.current}`}
+                                href={`/product/${product?.slug}`}
                                 className="border p-0.5 md:p-1 mr-2 rounded-md
                                  overflow-hidden group"
                               >
                                 <Image
-                                  src={urlFor(product?.images[0]).url()}
+                                  src={"https://i.ibb.co.com/dwxR1Xk9/1.jpg"}
                                   alt="productImage"
                                   width={500}
                                   height={500}
@@ -175,7 +176,7 @@ const CartPage = () => {
                                         onClick={() => {
                                           deleteCartProduct(product?._id);
                                           toast.success(
-                                            "Product deleted successfully!"
+                                            "Product deleted successfully!",
                                           );
                                         }}
                                         className="w-4 h-4 md:w-5 md:h-5 mr-1 text-gray-500 hover:text-red-600 hoverEffect"

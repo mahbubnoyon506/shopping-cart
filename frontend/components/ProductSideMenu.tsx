@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { Product } from "@/sanity.types";
-import useStore from "@/store";
+import useStore from "@/store/store";
+import { Product } from "@/utils/types";
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -17,7 +17,7 @@ const ProductSideMenu = ({
   const [existingProduct, setExistingProduct] = useState<Product | null>(null);
   useEffect(() => {
     const availableProduct = favoriteProduct?.find(
-      (item) => item?._id === product?._id
+      (item) => item?._id === product?._id,
     );
     setExistingProduct(availableProduct || null);
   }, [product, favoriteProduct]);
@@ -28,7 +28,7 @@ const ProductSideMenu = ({
         toast.success(
           existingProduct
             ? "Product removed successfully!"
-            : "Product added successfully!"
+            : "Product added successfully!",
         );
       });
     }

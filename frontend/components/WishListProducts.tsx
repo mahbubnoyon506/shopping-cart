@@ -1,17 +1,16 @@
 "use client";
 
-import useStore from "@/store";
+import useStore from "@/store/store";
 import { useState } from "react";
 import Container from "./Container";
 import { Heart, X } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { Product } from "@/sanity.types";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
 import PriceFormatter from "./PriceFormatter";
 import AddToCartButton from "./AddToCartButton";
+import { Product } from "@/utils/types";
 
 const WishListProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState(7);
@@ -22,7 +21,7 @@ const WishListProducts = () => {
 
   const handleResetWishlist = () => {
     const confirmReset = window.confirm(
-      "Are you sure you want to reset your wishlist?"
+      "Are you sure you want to reset your wishlist?",
     );
     if (confirmReset) {
       resetFavorite();
@@ -64,11 +63,11 @@ const WishListProducts = () => {
                         />
                         {product?.images && (
                           <Link
-                            href={`/product/${product?.slug?.current}`}
+                            href={`/product/${product?.slug}`}
                             className="border rounded-md group hidden md:inline-flex"
                           >
                             <Image
-                              src={urlFor(product?.images[0]).url()}
+                              src={"https://i.ibb.co.com/dwxR1Xk9/1.jpg"}
                               alt={"product image"}
                               width={80}
                               height={80}

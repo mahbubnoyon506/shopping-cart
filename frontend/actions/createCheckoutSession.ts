@@ -3,7 +3,7 @@
 import stripe from "@/lib/stripe";
 import { Address } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
-import { CartItem } from "@/store";
+import { CartItem } from "@/store/store";
 import Stripe from "stripe";
 
 export interface Metadata {
@@ -21,7 +21,7 @@ export interface GroupedCartItems {
 
 export async function createCheckoutSession(
   items: GroupedCartItems[],
-  metadata: Metadata
+  metadata: Metadata,
 ) {
   try {
     // Retrieve existing customer or create a new one

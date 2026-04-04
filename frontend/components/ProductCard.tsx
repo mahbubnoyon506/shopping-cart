@@ -1,5 +1,3 @@
-import { Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
@@ -9,15 +7,16 @@ import { Title } from "./ui/text";
 import ProductSideMenu from "./ProductSideMenu";
 import PriceView from "./PriceView";
 import AddToCartButton from "./AddToCartButton";
+import { Product } from "@/utils/types";
 
 const ProductCard = ({ product }: { product: Product }) => {
   return (
     <div className="text-sm border-[1px] rounded-md border-darkBlue/20 group bg-white">
       <div className="relative group overflow-hidden bg-shop_light_bg">
         {product?.images && (
-          <Link href={`/product/${product?.slug?.current}`}>
+          <Link href={`/product/${product?.slug}`}>
             <Image
-              src={urlFor(product.images[0]).url()}
+              src={"https://i.ibb.co.com/dwxR1Xk9/1.jpg"}
               alt="productImage"
               width={500}
               height={500}

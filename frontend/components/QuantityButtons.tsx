@@ -1,10 +1,9 @@
-import { Product } from "@/sanity.types";
-import useStore from "@/store";
-import React from "react";
+import useStore from "@/store/store";
 import { Button } from "./ui/button";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { Product } from "@/utils/types";
 
 interface Props {
   product: Product;

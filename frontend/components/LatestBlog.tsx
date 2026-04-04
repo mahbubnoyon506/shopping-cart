@@ -1,24 +1,25 @@
-import React from "react";
+"use client";
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import dayjs from "dayjs";
 import { Title } from "./ui/text";
-import { getLatestBlogs } from "@/sanity/queries";
+import { useGetBlogs } from "./hooks/useFetchBlogs";
+import { Blog } from "@/utils/types";
 
-const LatestBlog = async () => {
-  const blogs = await getLatestBlogs();
+const LatestBlog = () => {
+  const { data: blogs, isLoading, isError } = useGetBlogs();
+
   return (
     <div className="mb-10 lg:mb-20">
       <Title>Latest Blog</Title>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
-        {blogs?.map((blog) => (
+        {blogs?.data?.map((blog: Blog) => (
           <div key={blog?._id} className="rounded-lg overflow-hidden">
             {blog?.mainImage && (
-              <Link href={`/blog/${blog?.slug?.current}`}>
+              <Link href={`/blog/${blog?.slug}`}>
                 <Image
-                  src={urlFor(blog?.mainImage).url()}
+                  src={blog?.mainImage}
                   alt="blogImage"
                   width={500}
                   height={500}
@@ -46,7 +47,7 @@ const LatestBlog = async () => {
                 </p>
               </div>
               <Link
-                href={`/blog/${blog?.slug?.current}`}
+                href={`/blog/${blog?.slug}`}
                 className="text-base font-semibold tracking-wide mt-5 line-clamp-2 hover:text-shop_dark_green hoverEffect"
               >
                 {blog?.title}

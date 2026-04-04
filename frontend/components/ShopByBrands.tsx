@@ -1,12 +1,11 @@
-import React from "react";
+"use client";
 
 import Link from "next/link";
-
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
 import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
-import { getAllBrands } from "@/sanity/queries";
 import { Title } from "./ui/text";
+import { useGetBrands } from "./hooks/useFetchBrands";
+import { Brand } from "@/utils/types";
 
 const extraData = [
   {
@@ -31,8 +30,8 @@ const extraData = [
   },
 ];
 
-const ShopByBrands = async () => {
-  const brands = await getAllBrands();
+const ShopByBrands = () => {
+  const { data: brands, isLoading, isError } = useGetBrands();
 
   return (
     <div className="mb-10 lg:mb-20 bg-shop_light_bg p-5 lg:p-7 rounded-md">
@@ -46,15 +45,15 @@ const ShopByBrands = async () => {
         </Link>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2.5">
-        {brands?.map((brand) => (
+        {brands?.data?.map((brand: Brand) => (
           <Link
             key={brand?._id}
-            href={{ pathname: "/shop", query: { brand: brand?.slug?.current } }}
+            href={{ pathname: "/shop", query: { brands: brand?.slug } }}
             className="bg-white w-34 h-24 flex items-center justify-center rounded-md overflow-hidden hover:shadow-lg shadow-shop_dark_green/20 hoverEffect"
           >
             {brand?.image && (
               <Image
-                src={urlFor(brand?.image).url()}
+                src={brand?.image}
                 alt="brandImage"
                 width={250}
                 height={250}

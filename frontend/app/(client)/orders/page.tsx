@@ -1,23 +1,25 @@
+"use client";
 import Container from "@/components/Container";
+import { useGetMyOrders } from "@/components/hooks/useFetchOrders";
 import OrdersComponent from "@/components/OrdersComponent";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getMyOrders } from "@/sanity/queries";
-import { auth } from "@clerk/nextjs/server";
+import useStore from "@/store/store";
 import { FileX } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 
-const OrdersPage = async () => {
-  const { userId } = await auth();
-  if (!userId) {
-    return redirect("/");
-  }
+const OrdersPage = () => {
+  const { data: orders } = useGetMyOrders();
+  const { setOrders } = useStore();
 
-  const orders = await getMyOrders(userId);
+  useEffect(() => {
+    if (orders) {
+      setOrders(orders);
+    }
+  }, [orders, setOrders]);
 
   return (
     <div>
