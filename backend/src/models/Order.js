@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
     orderNumber: { type: String, unique: true },
     customerName: String,
     email: String,
-    clerkUserId: String, // Useful if using Clerk for Auth
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to User model
     stripeCheckoutSessionId: String,
     products: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },

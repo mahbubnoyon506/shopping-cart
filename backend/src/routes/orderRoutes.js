@@ -3,16 +3,20 @@ const router = express.Router();
 const {
     createOrder,
     getOrders,
-    getOrderById
+    getOrderById,
+    getMyOrders,
+
 } = require('../controllers/orderController');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
 
 // Standard routes
 router.route('/')
-    .get(verifyAdmin, getOrders)    // Admin-only route
-    .post(verifyToken, createOrder); // Authenticated user can create order
+    .get(verifyAdmin, getOrders)
+    .post(verifyToken, createOrder);
+
+router.route('/my-orders').get(verifyToken, getMyOrders)
 
 router.route('/:id')
-    .get(verifyToken, getOrderById); // Authenticated user can view own order
+    .get(verifyToken, getOrderById);
 
 module.exports = router;

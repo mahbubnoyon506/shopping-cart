@@ -1,6 +1,6 @@
 require('dotenv').config();
-const express = require("express")
-const app = express()
+const express = require("express");
+const app = express();
 const cors = require('cors');
 const authRoutes = require('./routes/authRoute');
 const productRoutes = require('./routes/productRoutes')
@@ -8,7 +8,7 @@ const orderRoutes = require('./routes/orderRoutes')
 const categoryRoutes = require('./routes/categoryRoutes')
 const blogRoutes = require('./routes/blogRoutes')
 const brandRoutes = require('./routes/brandRoutes')
-// const paymentsRoutes = require('./routes/paymentRoutes')
+const paymentsRoutes = require('./routes/paymentRoutes')
 const connectDB = require('./config/db');
 
 const cloudinary = require("cloudinary").v2;
@@ -21,6 +21,11 @@ cloudinary.config({
 });
 
 
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+    const { stripeWebhook } = require('./controllers/paymentController');
+    stripeWebhook(req, res);
+});
+
 // Middlewares
 app.use(cors())
 app.use(express.json())
@@ -30,14 +35,13 @@ app.use(express.urlencoded({ extended: true }))
 connectDB();
 
 //Routes
-// app.use('/api/payments/webhook', express.raw({ type: '*/*' }));
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/brands', brandRoutes);
-// app.use('/api/payments', paymentsRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 //Health check
 app.get('/', (req, res) => {

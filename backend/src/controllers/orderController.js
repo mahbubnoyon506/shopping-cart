@@ -53,6 +53,7 @@ exports.createOrder = async (req, res) => {
             orderNumber,
             customerName,
             email,
+            user: req.user.id,
             products: processedProducts,
             totalPrice,
             address,
@@ -101,6 +102,18 @@ exports.getOrderById = async (req, res) => {
         if (!order) return res.status(404).json({ message: "Order not found" });
 
         res.status(200).json({ success: true, data: order });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getMyOrders = async (req, res) => {
+    try {
+        const userId = req.user.id
+        const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+        if (!orders) return res.status(404).json({ message: "Order not found" });
+
+        res.status(200).json({ success: true, data: orders });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
