@@ -13,10 +13,6 @@ const menuItems = [
 export default function Sidebar() {
   const pathName = usePathname();
 
-  console.log(pathName);
-
-  const [isActive, setIsActive] = useState(false);
-
   return (
     <aside className="w-64 bg-shop_dark_green text-white hidden md:flex flex-col">
       <div className="p-6 text-2xl font-black text-white">SHOPCART</div>
