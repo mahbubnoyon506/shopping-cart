@@ -13,7 +13,7 @@ const generateToken = (id, role) => {
 exports.signUp = async (req, res) => {
     try {
         const { email, password, role } = req.body;
-        console.log(req.body);
+        // console.log(req.body);
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -29,7 +29,7 @@ exports.signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email })
-        console.log(user);
+        // console.log(user);
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ error: "Invalid credentials" })

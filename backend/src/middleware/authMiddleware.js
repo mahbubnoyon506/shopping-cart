@@ -13,8 +13,9 @@ const verifyToken = (req, res, next) => {
 }
 
 const verifyAdmin = (req, res, next) => {
+
     verifyToken(req, res, () => {
-        if (!req.user || req.user.role !== 'admin') {
+        if (!req.user || req.user.role[0] !== 'admin') {
             return res.status(403).json({ error: 'Admin access required' })
         }
         next()
@@ -23,7 +24,7 @@ const verifyAdmin = (req, res, next) => {
 
 const verifyRole = (...allowedRoles) => (req, res, next) => {
     verifyToken(req, res, () => {
-        if (!req.user || !allowedRoles.includes(req.user.role)) {
+        if (!req.user || !allowedRoles.includes(req.user.role[0])) {
             return res.status(403).json({ error: 'Insufficient role privileges' })
         }
         next()

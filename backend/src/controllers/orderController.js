@@ -88,6 +88,8 @@ exports.getOrders = async (req, res) => {
 
         res.status(200).json({ success: true, count: orders.length, data: orders });
     } catch (error) {
+        console.log(error);
+
         res.status(500).json({ success: false, message: error.message });
     }
 };
@@ -104,6 +106,17 @@ exports.getOrderById = async (req, res) => {
         res.status(200).json({ success: true, data: order });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Delete order
+// @route   DELETE /api/orders/:id
+exports.deleteOrder = async (req, res) => {
+    try {
+        await Order.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: "Order deleted" });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 

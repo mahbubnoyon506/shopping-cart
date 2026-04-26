@@ -39,30 +39,30 @@ exports.createCheckout = async (req, res) => {
 };
 
 exports.stripeWebhook = async (req, res) => {
-    console.log("API triggered....");
+    // console.log("API triggered....");
     const sig = req.headers['stripe-signature'];
     let event;
 
-    console.log("Webhook received, event type:", req.body.type || "unknown");
+    // console.log("Webhook received, event type:", req.body.type || "unknown");
     try {
         event = stripe.webhooks.constructEvent(
             req.body,
             sig,
             process.env.STRIPE_WEBHOOK_SECRET
         );
-        console.log("Event verified:", event.type);
+        // console.log("Event verified:", event.type);
     } catch (err) {
         console.error("Webhook signature verification failed:", err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    console.log("Full event object:", JSON.stringify(event, null, 2));
+    // console.log("Full event object:", JSON.stringify(event, null, 2));
 
     if (event.type === 'checkout.session.completed') {
-        console.log("Processing checkout.session.completed event");
+        // console.log("Processing checkout.session.completed event");
         const session = event.data.object;
-        console.log("Session ID:", session.id);
-        console.log("Session metadata:", session.metadata);
+        // console.log("Session ID:", session.id);
+        // console.log("Session metadata:", session.metadata);
 
         const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
             session.id, { expand: ['line_items'] }
