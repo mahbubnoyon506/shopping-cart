@@ -7,12 +7,12 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. If no token and trying to access protected routes
-  if (
-    !token &&
-    (pathname.startsWith("/dashboard") || pathname.startsWith("/wishlist"))
-  ) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // if (
+  //   !token &&
+  //   (pathname.startsWith("/dashboard") || pathname.startsWith("/wishlist"))
+  // ) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 
   if (token) {
     try {
@@ -22,9 +22,12 @@ export async function proxy(request: NextRequest) {
       const role = payload.role as string;
 
       // 2. Admin Route Protection
-      if (pathname.startsWith("/dashboard") && role !== "admin") {
+      if (pathname.startsWith("/dashboard")) {
         return NextResponse.redirect(new URL("/", request.url));
       }
+      // if (pathname.startsWith("/dashboard") && role !== "admin") {
+      //   return NextResponse.redirect(new URL("/", request.url));
+      // }
 
       // 3. Prevent logged-in users from hitting login/register
       // if (pathname === "/login" || pathname === "/register") {
