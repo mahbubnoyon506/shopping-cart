@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import ProductForm from "../components/ProductForm";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function ProductsPage() {
   const queryClient = useQueryClient();
@@ -122,32 +123,15 @@ export default function ProductsPage() {
       </div>
 
       {/* Confirmation Modal */}
-      {deletingId && (
-        <div className="fixed inset-0 bg-darkColor/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
-            <h3 className="text-xl font-black text-shop_dark_green mb-2">
-              Delete Product?
-            </h3>
-            <p className="text-lightColor mb-6">
-              Are you sure? This will remove the item from the shop permanently.
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setDeletingId(null)}
-                className="flex-1 py-3 font-bold text-lightColor bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => deleteMutation.mutate(deletingId)}
-                className="flex-1 py-3 font-bold text-white bg-shop_orange rounded-xl hover:bg-red-600 transition-colors"
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={!!deletingId}
+        isLoading={deleteMutation.isPending}
+        title="Delete Product?"
+        message="Are you sure you want to remove this product? This will delete it from the database permanently."
+        confirmText="Yes, Delete"
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => deletingId && deleteMutation.mutate(deletingId)}
+      />
     </div>
   );
 }

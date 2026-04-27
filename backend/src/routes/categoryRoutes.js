@@ -7,14 +7,15 @@ const {
     updateCategory,
     deleteCategory
 } = require('../controllers/categoryController');
+const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
 
 router.route('/')
     .get(getCategories)
-    .post(createCategory);
+    .post(verifyToken, verifyAdmin, createCategory);
 
 router.route('/:id')
-    .patch(updateCategory)
-    .delete(deleteCategory);
+    .patch(verifyToken, verifyAdmin, updateCategory)
+    .delete(verifyToken, verifyAdmin, deleteCategory);
 
 router.get('/slug/:slug', getCategoryBySlug);
 

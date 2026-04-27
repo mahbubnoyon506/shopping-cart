@@ -7,6 +7,7 @@ const menuItems = [
   { name: "Dashboard", path: "/dashboard" },
   { name: "Orders", path: "/dashboard/orders" },
   { name: "Products", path: "/dashboard/products" },
+  { name: "Product Categories", path: "/dashboard/product-categories" },
   { name: "Users", path: "/dashboard/users" },
 ];
 

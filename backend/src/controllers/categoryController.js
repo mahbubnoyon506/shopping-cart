@@ -6,13 +6,51 @@ const slugify = require('slugify');
 // @route   POST /api/categories
 exports.createCategory = async (req, res) => {
     try {
-        if (req.body.title) {
-            req.body.slug = slugify(req.body.title, { lower: true, strict: true });
+        const title = req.body.title || req.body.name;
+
+        if (!title) {
+            return res.status(400).json({ success: false, message: "Title is required" });
         }
-        const category = await Category.create(req.body);
+
+        // Generate slug
+        const slug = slugify(title, { lower: true, strict: true });
+
+        // Check if title or slug already exists
+        const existingCategory = await Category.findOne({
+            $or: [
+                { slug },
+                { title },
+                { name: title }
+            ]
+        });
+        if (existingCategory) {
+            return res.status(400).json({
+                success: false,
+                message: "A category with this title already exists"
+            });
+        }
+
+        const categoryData = {
+            title,
+            name: title,
+            slug,
+            description: req.body.description,
+            featured: req.body.featured,
+            image: req.body.image
+        };
+
+        const category = await Category.create(categoryData);
         res.status(201).json({ success: true, data: category });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        console.log("Category creation..", error);
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: "A category with this name or slug already exists."
+            });
+        }
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -51,9 +89,13 @@ exports.getCategoryBySlug = async (req, res) => {
 // @route   PATCH /api/categories/:id
 exports.updateCategory = async (req, res) => {
     try {
-        if (req.body.title) {
-            req.body.slug = slugify(req.body.title, { lower: true, strict: true });
+        const title = req.body.title || req.body.name;
+        if (title) {
+            req.body.title = title;
+            req.body.name = title;
+            req.body.slug = slugify(title, { lower: true, strict: true });
         }
+
         const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
