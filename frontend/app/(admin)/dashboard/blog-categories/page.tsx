@@ -1,0 +1,102 @@
+"use client";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { useForm } from "react-hook-form";
+import ConfirmModal from "../components/ConfirmModal";
+
+export default function BlogCategoriesPage() {
+  const queryClient = useQueryClient();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { register, handleSubmit, reset } = useForm();
+
+  const { data: categories } = useQuery({
+    queryKey: ["blog-categories"],
+    queryFn: async () => (await api.get("/blogs/categories")).data,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editingId) return api.patch(`/blogs/categories/${editingId}`, data);
+      return api.post("/blogs/categories", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blog-categories"] });
+      reset();
+      setEditingId(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/blogs/categories/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blog-categories"] });
+      setDeletingId(null);
+    },
+  });
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-black text-shop_dark_green">
+        Blog Category Management
+      </h1>
+
+      <form
+        onSubmit={handleSubmit((d) => saveMutation.mutate(d))}
+        className="bg-white p-6 rounded-xl border flex gap-4 items-end"
+      >
+        <div className="flex-1">
+          <label className="text-sm font-bold text-lightColor">
+            Category Name
+          </label>
+          <input
+            {...register("title", { required: true })}
+            className="w-full p-2 border rounded-md"
+          />
+        </div>
+        <button className="bg-shop_dark_green text-white px-6 py-2 rounded-lg font-bold">
+          {editingId ? "Update Category" : "Add Category"}
+        </button>
+      </form>
+
+      <div className="bg-white rounded-xl shadow-sm border">
+        {categories?.data?.map((cat: any) => (
+          <div
+            key={cat._id}
+            className="p-4 border-b flex justify-between items-center"
+          >
+            <span className="font-medium text-shop_dark_green">
+              {cat.title}
+            </span>
+            <div className="space-x-4">
+              <button
+                onClick={() => {
+                  setEditingId(cat._id);
+                  reset(cat);
+                }}
+                className="text-shop_dark_green font-bold"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => setDeletingId(cat._id)}
+                className="text-shop_orange font-bold"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <ConfirmModal
+        isOpen={!!deletingId}
+        title="Delete Category?"
+        message="Are you sure you want to delete this blog category?"
+        onClose={() => setDeletingId(null)}
+        onConfirm={() => deletingId && deleteMutation.mutate(deletingId)}
+      />
+    </div>
+  );
+}

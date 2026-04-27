@@ -9,6 +9,8 @@ const menuItems = [
   { name: "Products", path: "/dashboard/products" },
   { name: "Product Categories", path: "/dashboard/product-categories" },
   { name: "Users", path: "/dashboard/users" },
+  { name: "Blogs", path: "/dashboard/blogs" },
+  { name: "Blog Categories", path: "/dashboard/blog-categories" },
 ];
 
 export default function Sidebar() {

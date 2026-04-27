@@ -5,18 +5,30 @@ const {
     getBlogs,
     getBlogBySlug,
     createBlogCategory,
-    getBlogCategories
+    getBlogCategories,
+    updateBlog,
+    deleteBlog,
+    updateBlogCategory,
+    deleteBlogCategory
 } = require('../controllers/blogController');
+const { verifyAdmin } = require('../middleware/authMiddleware');
 
 // Blog Category Routes
 router.route('/categories')
     .get(getBlogCategories)
-    .post(createBlogCategory);
+    .post(verifyAdmin, createBlogCategory);
+
+router.route('/categories/:id')
+    .patch(verifyAdmin, updateBlogCategory)
+    .delete(verifyAdmin, deleteBlogCategory);
 
 // Blog Routes
 router.route('/')
     .get(getBlogs)
-    .post(createBlog);
+    .post(verifyAdmin, createBlog);
+router.route('/:id')
+    .patch(verifyAdmin, updateBlog)
+    .delete(verifyAdmin, deleteBlog);
 
 router.get('/:slug', getBlogBySlug);
 

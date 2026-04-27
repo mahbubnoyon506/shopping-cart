@@ -52,3 +52,50 @@ exports.getBlogBySlug = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+exports.updateBlog = async (req, res) => {
+    try {
+        if (req.body.name) {
+            req.body.slug = slugify(req.body.name, { lower: true, strict: true });
+        }
+        const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        res.status(200).json({ success: true, data: blog });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+exports.deleteBlog = async (req, res) => {
+    try {
+        await Blog.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: "Blog deleted" });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+exports.updateBlogCategory = async (req, res) => {
+    try {
+        if (req.body.title) {
+            req.body.slug = slugify(req.body.title, { lower: true, strict: true });
+        }
+        const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        res.status(200).json({ success: true, data: blog });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+exports.deleteBlogCategory = async (req, res) => {
+    try {
+        await Blog.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: "Blog deleted" });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
