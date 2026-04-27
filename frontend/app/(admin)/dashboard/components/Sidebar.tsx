@@ -5,10 +5,11 @@ import { useState } from "react";
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard" },
-  { name: "Orders", path: "/dashboard/orders" },
   { name: "Products", path: "/dashboard/products" },
   { name: "Product Categories", path: "/dashboard/product-categories" },
+  { name: "Orders", path: "/dashboard/orders" },
   { name: "Users", path: "/dashboard/users" },
+  { name: "Brands", path: "/dashboard/brands" },
   { name: "Blogs", path: "/dashboard/blogs" },
   { name: "Blog Categories", path: "/dashboard/blog-categories" },
 ];
