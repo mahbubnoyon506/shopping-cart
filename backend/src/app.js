@@ -10,6 +10,8 @@ const blogRoutes = require('./routes/blogRoutes')
 const brandRoutes = require('./routes/brandRoutes')
 const paymentsRoutes = require('./routes/paymentRoutes')
 const userRoutes = require('./routes/userRoutes')
+const statsRoutes = require('./routes/statsRoutes')
+const analyticsRoute = require('./routes/analyticsRoutes')
 const connectDB = require('./config/db');
 
 const cloudinary = require("cloudinary").v2;
@@ -44,6 +46,8 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentsRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/analytics', analyticsRoute);
 
 //Health check
 app.get('/', (req, res) => {
