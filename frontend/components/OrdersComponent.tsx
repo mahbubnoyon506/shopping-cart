@@ -12,13 +12,11 @@ import { format } from "date-fns";
 import { X } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
 import OrderDetailDialog from "./OrderDetailDialog";
+import { Order } from "@/utils/types";
 
-const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
-  const [selectedOrder, setSelectedOrder] = useState<
-    MY_ORDERS_QUERYResult[number] | null
-  >(null);
+const OrdersComponent = ({ orders }: { orders: Order }) => {
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const handleDelete = () => {
     toast.error("Delete method applied for Admin");
   };
@@ -37,8 +35,8 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     {order.orderNumber?.slice(-10) ?? "N/A"}...
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {order?.orderDate &&
-                      format(new Date(order.orderDate), "dd/MM/yyyy")}
+                    {order?.createdAt &&
+                      format(new Date(order.createdAt), "dd/MM/yyyy")}
                   </TableCell>
                   <TableCell>{order.customerName}</TableCell>
                   <TableCell className="hidden sm:table-cell">

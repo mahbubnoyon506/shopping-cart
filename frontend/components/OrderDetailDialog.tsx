@@ -1,4 +1,3 @@
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
@@ -12,11 +11,12 @@ import {
   TableRow,
 } from "./ui/table";
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
 import PriceFormatter from "./PriceFormatter";
+import { format } from "date-fns";
+import { Order } from "@/utils/types";
 
 interface OrderDetailsDialogProps {
-  order: MY_ORDERS_QUERYResult[number] | null;
+  order: Order;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -27,7 +27,14 @@ const OrderDetailDialog: React.FC<OrderDetailsDialogProps> = ({
   onClose,
 }) => {
   if (!order) return null;
-  console.log(order);
+
+  const discount = (products) => {
+    const disValue = products.reduce(
+      (acc, item) => acc + (item.discount * item.price) / 100,
+      0,
+    );
+    return disValue;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -44,7 +51,8 @@ const OrderDetailDialog: React.FC<OrderDetailsDialogProps> = ({
           </p>
           <p>
             <strong>Date:</strong>{" "}
-            {order.orderDate && new Date(order.orderDate).toLocaleDateString()}
+            {order?.createdAt &&
+              format(new Date(order.createdAt), "dd/MM/yyyy")}
           </p>
           <p>
             <strong>Status:</strong>{" "}
@@ -53,17 +61,17 @@ const OrderDetailDialog: React.FC<OrderDetailsDialogProps> = ({
             </span>
           </p>
           <p>
-            <strong>Invoice Number:</strong> {order?.invoice?.number}
+            <strong>Invoice Number:</strong> {order?.invoiceNumber}
           </p>
-          {order?.invoice && (
+          {
             <Button className="bg-transparent border text-darkColor/80 mt-2 hover:text-darkColor hover:border-darkColor hover:bg-darkColor/10 hoverEffect ">
-              {order?.invoice?.hosted_invoice_url && (
-                <Link href={order?.invoice?.hosted_invoice_url} target="_blank">
+              {
+                <Link href={""} target="_blank">
                   Download Invoice
                 </Link>
-              )}
+              }
             </Button>
-          )}
+          }
         </div>
         <Table>
           <TableHeader>
@@ -71,15 +79,16 @@ const OrderDetailDialog: React.FC<OrderDetailsDialogProps> = ({
               <TableHead>Product</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Discount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {order.products?.map((product, index) => (
               <TableRow key={index}>
                 <TableCell className="flex items-center gap-2">
-                  {product?.product?.images && (
+                  {product && (
                     <Image
-                      src={urlFor(product?.product?.images[0]).url()}
+                      src={product.image}
                       alt="productImage"
                       width={50}
                       height={50}
@@ -87,46 +96,47 @@ const OrderDetailDialog: React.FC<OrderDetailsDialogProps> = ({
                     />
                   )}
 
-                  {product?.product && product?.product?.name}
+                  {product && product?.name}
                 </TableCell>
                 <TableCell>{product?.quantity}</TableCell>
                 <TableCell>
                   <PriceFormatter
-                    amount={product?.product?.price}
+                    amount={product?.price}
                     className="text-black font-medium"
                   />
                 </TableCell>
+                <TableCell>{product?.discount + "%"}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
         <div className="mt-4 text-right flex items-center justify-end">
           <div className="w-44 flex flex-col gap-1">
-            {order?.amountDiscount !== 0 && (
-              <div className="w-full flex items-center justify-between">
-                <strong>Discount: </strong>
-                <PriceFormatter
-                  amount={order?.amountDiscount}
-                  className="text-black font-bold"
-                />
-              </div>
-            )}
-            {order?.amountDiscount !== 0 && (
+            {
               <div className="w-full flex items-center justify-between">
                 <strong>Subtotal: </strong>
                 <PriceFormatter
-                  amount={
-                    (order?.totalPrice as number) +
-                    (order?.amountDiscount as number)
-                  }
+                  amount={order?.totalPrice as number}
                   className="text-black font-bold"
                 />
               </div>
-            )}
+            }
+            {
+              <div className="w-full flex items-center justify-between">
+                <strong>Discount: </strong>
+                <PriceFormatter
+                  amount={discount(order?.products)}
+                  className="text-black font-bold"
+                />
+              </div>
+            }
             <div className="w-full flex items-center justify-between">
               <strong>Total: </strong>
               <PriceFormatter
-                amount={order?.totalPrice}
+                amount={
+                  (order?.totalPrice as number) -
+                  (discount(order?.products) as number)
+                }
                 className="text-black font-bold"
               />
             </div>

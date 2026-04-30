@@ -1,6 +1,9 @@
+const crypto = require('crypto');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+
+const generateInvoiceNumber = () => `INV-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
 exports.createCheckout = async (req, res) => {
     const { items, metadata } = req.body;
@@ -12,7 +15,10 @@ exports.createCheckout = async (req, res) => {
                 product_data: {
                     name: item.product.name,
                     images: item.product.images?.length > 0 ? [item.product.images[0].url] : [],
-                    metadata: { id: item.product._id.toString() }
+                    metadata: {
+                        id: item.product._id.toString(),
+                        discount: item.product.discount?.toString() || '0'
+                    }
                 },
             },
             quantity: item.quantity,
@@ -65,7 +71,8 @@ exports.stripeWebhook = async (req, res) => {
         // console.log("Session metadata:", session.metadata);
 
         const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
-            session.id, { expand: ['line_items'] }
+            session.id,
+            { expand: ['line_items.data.price.product'] }
         );
         console.log("Session with line items retrieved");
         console.log("Line items data:", JSON.stringify(sessionWithLineItems.line_items.data, null, 2));
@@ -78,8 +85,41 @@ exports.stripeWebhook = async (req, res) => {
                 return res.json({ received: true, message: 'Order already processed' });
             }
 
+            const lineItems = sessionWithLineItems.line_items.data;
+            const productIds = lineItems
+                .map((item) => {
+                    const expandedProduct = item.price.product && typeof item.price.product === 'object'
+                        ? item.price.product
+                        : null;
+                    return expandedProduct?.metadata?.id || item.price.metadata?.id;
+                })
+                .filter(Boolean);
+
+            const productsFromDb = await Product.find({ _id: { $in: productIds } }).lean();
+            const productMap = new Map(productsFromDb.map((product) => [product._id.toString(), product]));
+
+            const products = lineItems.map((item) => {
+                console.log("Processing item:", JSON.stringify(item, null, 2));
+                const expandedProduct = item.price.product && typeof item.price.product === 'object'
+                    ? item.price.product
+                    : null;
+                const productId = expandedProduct?.metadata?.id || item.price.metadata?.id || null;
+                const dbProduct = productId ? productMap.get(productId) : null;
+                const unitAmount = item.price?.unit_amount || 0;
+
+                return {
+                    product: productId,
+                    name: dbProduct?.name || item.description || expandedProduct?.name || 'Unknown Product',
+                    image: dbProduct?.images?.[0]?.url || expandedProduct?.images?.[0] || '',
+                    price: dbProduct?.price ?? Math.round(unitAmount / 100),
+                    discount: dbProduct?.discount ?? Number(expandedProduct?.metadata?.discount || 0),
+                    quantity: item.quantity || 1,
+                };
+            });
+
             const orderData = {
                 orderNumber: session.metadata.orderNumber,
+                invoiceNumber: generateInvoiceNumber(),
                 stripeCheckoutSessionId: session.id,
                 user: session.metadata.userId,
                 customerName: session.customer_details.name,
@@ -88,13 +128,7 @@ exports.stripeWebhook = async (req, res) => {
                 currency: session.currency,
                 status: "paid",
                 address: JSON.parse(session.metadata.address),
-                products: sessionWithLineItems.line_items.data.map(item => {
-                    console.log("Processing item:", JSON.stringify(item, null, 2));
-                    return {
-                        product: item.price.product.metadata?.id || item.price.metadata?.id,
-                        quantity: item.quantity
-                    };
-                })
+                products,
             };
             console.log("Order data to create:", JSON.stringify(orderData, null, 2));
 

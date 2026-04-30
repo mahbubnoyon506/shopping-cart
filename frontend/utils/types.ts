@@ -52,6 +52,7 @@ export type OrderStatus =
 
 export interface Order extends BaseDocument {
   orderNumber: string;
+  invoiceNumber: string;
   customerName: string;
   email: string;
   clerkUserId?: string;
@@ -66,8 +67,12 @@ export interface Order extends BaseDocument {
     address: string;
   };
   products: Array<{
-    product: string | Product;
+    product: string;
     quantity: number;
+    name: string;
+    price: number;
+    image: string;
+    discount: number;
   }>;
 }
 
