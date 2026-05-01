@@ -14,33 +14,35 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // 1. Sign In
+      // 1. Authenticate and get the token
       const res = await api.post("/auth/signin", { email, password });
 
       if (res.status === 200) {
         const token = res.data.token;
+
+        // 2. setAuth now automatically handles:
         setAuth(token);
 
-        // Save token to cookie so Middleware can see it
-        document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
-
-        const userRes = await api.get("/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // 3. Fetch user profile
+        const userRes = await api.get("/auth/me");
 
         if (userRes.status === 200) {
           const userData = {
             id: userRes.data.user._id,
             email: userRes.data.user.email,
             role: userRes.data.user.role[0],
+            name: userRes.data.user.name, // Added for completeness
           };
 
           setUser(userData);
-          //   router.push(userData.role === "admin" ? "/dashboard" : "/wishlist");
+
+          // 4. Redirect after successful state update
+          // router.push("/dashboard");
         }
       }
-    } catch (err) {
-      console.error("Login failed", err);
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Login failed";
+      console.error(message);
     }
   };
 

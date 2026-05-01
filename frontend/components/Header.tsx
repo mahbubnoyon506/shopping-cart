@@ -7,16 +7,57 @@ import SearchBar from "./SearchBar";
 
 import MobileMenu from "./MobileMenu";
 import Link from "next/link";
-import { Logs } from "lucide-react";
+import { LayoutDashboard, Logs } from "lucide-react";
 import FavoriteButton from "./FavouriteButton";
 import CartIcon from "./CartIcon";
 import { useAuthStore } from "@/store/authStore";
-import useStore from "@/store/store";
+
+import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
-  const { user } = useAuthStore();
-  const { orders } = useStore();
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
 
+  const menuItems = [
+    {
+      id: 1,
+      name: "Profile",
+      href: "/profile",
+      icon: <UserIcon />,
+    },
+    {
+      id: 2,
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <LayoutDashboard />,
+      adminOnly: true,
+    },
+    {
+      id: 3,
+      name: "Orders",
+      href: "/orders",
+      icon: <Logs />,
+    },
+    {
+      id: 4,
+      name: "Settings",
+      href: "/settings",
+      icon: <SettingsIcon />,
+    },
+  ];
+  const filteredMenuItems = menuItems.filter(
+    (item) => !item.adminOnly || (item.adminOnly && user?.role === "admin"),
+  );
   return (
     <header className="sticky top-0 z-50 py-5 bg-white/70 backdrop-blur-md">
       <Container className="flex items-center justify-between text-lightColor">
@@ -30,23 +71,40 @@ const Header = () => {
           <CartIcon />
           <FavoriteButton />
 
-          {user && (
-            <Link
-              href={"/orders"}
-              className="group relative hover:text-shop_light_green hoverEffect"
-            >
-              <Logs />
-              <span className="absolute -top-1 -right-1 bg-shop_btn_dark_green text-white h-3.5 w-3.5 rounded-full text-xs font-semibold flex items-center justify-center">
-                {orders?.length ? orders?.length : 0}
-              </span>
+          {user ? (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger className=" cursor-pointer" asChild>
+                  <UserIcon />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {filteredMenuItems.map((menu) => (
+                    <DropdownMenuItem
+                      onClick={() => router.push(menu.href)}
+                      key={menu.id}
+                      className=" cursor-pointer"
+                    >
+                      {menu.icon}
+                      {menu.name}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className=" cursor-pointer"
+                    variant="destructive"
+                    onClick={logout}
+                  >
+                    <LogOutIcon />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link href="/login">
+              <Button>Login</Button>
             </Link>
           )}
-
-          {/* <ClerkLoaded>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </ClerkLoaded> */}
         </div>
       </Container>
     </header>
