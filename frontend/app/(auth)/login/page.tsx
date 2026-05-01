@@ -37,7 +37,7 @@ export default function LoginPage() {
           setUser(userData);
 
           // 4. Redirect after successful state update
-          // router.push("/dashboard");
+          router.push(userData.role === "admin" ? "/dashboard" : "/");
         }
       }
     } catch (err: any) {
